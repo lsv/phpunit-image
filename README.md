@@ -8,8 +8,8 @@ In your own Dockerfile
 FROM lsv20/phpunit-image
 COPY . /app
 WORKDIR /app
-RUN composer --no-scripts install && \
-    vendor/bin/phpunit
+RUN composer.phar --no-scripts install && \
+    phpunit
 ```
 
 Test your application directly from the commandline
@@ -17,6 +17,11 @@ Test your application directly from the commandline
 ```bash
 docker build -t lsv20/phpunit-image .
 ```
+
+### bins
+
+* composer is in `/usr/local/bin/composer.phar`, can be called as `composer.phar`
+* phpunit is installed as global, which are in `PATH`, can be called as `phpunit`
 
 ###### Why not PHPUnit 6
 

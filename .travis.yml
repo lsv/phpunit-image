@@ -1,0 +1,20 @@
+sudo: required
+
+services:
+    - docker
+
+env:
+    global:
+      - secure: XbcX3ruHFSY79LORMyAl9ysMxnEKVbAoQB454/T77UCfzgXC449ol49/4QhyYlM2hykqkIUzMoQIe1KVBY+DQ5l9VgYRIfzdHL9U9E0qIdFzDePssI+6e6vd5L6PJx/gfHJWiC1rkmQnBKg7KlNBf4WbnDjIJVAQsh47FBlpc4d4eLAulK4qniT9ytlqFl5mdvlkv+Hv1Pkw/iZitV5iZyLQh+c5mUrP6GET5RYk/3WVmg7W4uFBzzpnYq0/GjqI1xKjGh0EfhYICUh49YV5cvKefhZsCNrQzrXtm57xyfQDk5QS/MYm2gipJCGRsD/fd+kwJCbNHGmHcjMWIhUFK4nb38qNd9KPyGQjJo1/zTHpbRdTgcffied09lS6McwdBaDzLeVg6mNuxb1s67tP5Zo/8tSPF7mOUi7OOnmhlMgZoQpFelsUqPkfO9niC2vUqM8KCVsMJVE1YAfT1KUV/m2eFkBZAPfmQsDgLB2lMWZ8lLRUSLnPX+R1cxjtoHYu7FJUY2fX6ZC2w8RJCaKA9ZaCMzqbs2EubsagAWwvCZGyK97YzibrM7ispJ/QXhCogC7HtM5CGqZuqefmggxO9fBFAxgAm59FwjHY68WIRGFPP0PXjMqCrUxVKHp5mBLBU1SgUm3vnIhk/Mbt5jVoFJxQPyqHBT116V8O7tAhhd8=
+      - secure: tIpMMEGsnO176qA9Q5lx8x9mYeSYm3egpTnrTno3rQ1bIQ1egysv8XhojsEGi0xiVvvG8VfsbhVc4ZchhSR14uce7UJkx1ZSYcfGjuIiQvMuxuaozH101FFZyJhzG9npiDZoebQLxP/SVUWMK8i7Dj0fclNAJ+pqfA6eD7zXSBzG+76q2M3yKTm08PZB6nGjm3yzMTB066EUhLre2FszA8XWt90lTX7zUSJeSASiARXeNCN3dWbUcU4Vb9JdmUYMVZqxHPDjZ64Zdpi79IMmD4o9QPNA9lUpHKy+zpPMCKUaPzetMUYTs5LOJi+KDagkN0LdpXmLJAnjRZRDi9YIGZGBqjWQ2z7TVqmoekFyMMraokBsoTC6AXmS4aKgCoZRyWl7Lj0dU9cIB6PwAH0OCA0bOL1uab8GG1VzQyyguy6z53r52PoAMYK+J9JmGv3tedBbtPsaTsoOGFNZFx8hAYbuXNz7U1xU2Ewsoqc9Us90g4GWaiDq1O/HPxlUuIQ0B/CEng02PfG2NNodyys6+VWUxZYcSmjrDzP7Bb5AwEWiQzw5YpDAtu6N2S6PTWHfFhZ4QLIv2/GXlmnFVrH9NS5GMoCGNdmsEOUvmyT9nnZiMlLonEltONcZi6A/AnjVQBKlr/QmzweT3qT7pyeBz+2qRnYb+zGoV7EtyXJqymA=
+      - secure: vs5RvKtkitp6UYSTLxT8Yr4ljiRhVrPkabu/yDJtPyXAI7v3kjD/CIqbB0o3eVbInPCrCzeEjHqWCB302K4wHF7mCiN9tGza59BLGttzby/lp+UNjrnssLCBX72CcVBneH0QSxK4JhDRSPzS0+dovgy4Yi3f21IgWoSDeiktEfy9KxrSg3ewKzdou5NKOc93OUneK9zBLya8pKh7qoRxpEsRpwGhQlVp535qAYqtnGXLoizMUZogGLVLkwikT3nXRqSF1yxVzR86c6qf2NoW3Srb34CoKyIm1Yxx9reNB7A52QRJK0DgTyUqY7CDJTQbqJTdLfYCGaufqJkkb/INiXuLLsuE+l5HmSPbtIrQg7Sm2E1oVMfqP4MfvmfitSOYaoSaJHlSmEBfriHlfIl58CML3jkGnrVSypsL0wBGvkkHmQw5gpB3xAAaGUf9+GR9Ulnc02xmtu9ea0hoqlVTva5MUW62NNNTcaZlirggh77lvw9y6Hn3FhvOVQiK7WsidOkJqxJ5S3uq6JiJ5GAiFrU2iWIsReflfnAHYRi+LWw1RLF9HfduddQlf6LSYONXBeFBi395qjnmZ91EiekDE4Bykz4+6mRyMj7dYiU5Va1sbqVCFCwanRnUQvvIjmpdozkTNwtfKhjl/h/YIzDyyWrWaolsqsc0a5QDPezqYiA=
+      - COMMIT=${TRAVIS_COMMIT::8}
+
+after_success:
+    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+    - export REPO=lsv20/phpunit-image
+    - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+    - docker build -f Dockerfile -t $REPO:$COMMIT .
+    - docker tag $REPO:$COMMIT $REPO:$TAG
+    - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+    - docker push $REPO
